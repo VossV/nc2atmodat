@@ -1,0 +1,54 @@
+How to process netCDF model data?
+---------------------------------
+
+to run this programm run it with:
+
+  ipython process_model_data.py
+or:  
+  python process_model_data.py
+
+This program contains five parts:
+ - process_model_data.py
+ - dict_OUTPUT_variables.py 
+ - dict_custom_variables_attributes.py 
+ - Metadata_for_atmodat_standard.xlsx
+ - functions.py
+ 
+ to translate process_model_data.ipynb to an python file:
+  "jupyter nbconvert --to script process_model_data.ipynb"
+
+#===============================
+     Description of files:
+#===============================
+
+process_model_data.py
+---------------------
+- main program
+- add here path, input-file, output-file and metadata-file
+- rewrite coordinates and dimensions
+- add georeferencing to dataset by adding geographical and utm coordinates
+- removes variables that are not meant for publication.
+
+
+functions.py
+------------
+- contains all functions used for process_model_data.py
+
+dict_MEMI_record_numbers.py 
+---------------------------
+- contains dictionaries with all variables that should be published
+
+dict_custom_variables_attributes.py 
+---------------------------
+- contains dictionaries with variables and attributes.
+- user specific descriptions for variables can be added here.
+  e.g. tracer = pm10, pm2.5 or comments on the variables (references, explanations)
+
+
+Metadata_for_atmodat_standard.xlsx
+----------------------------------
+- contains global metadata that should be added to the file.
+- must be filled by the producer for each dataset individually
+ 
+
+
