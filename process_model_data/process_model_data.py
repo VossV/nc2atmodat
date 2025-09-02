@@ -33,6 +33,9 @@ use_own_ijk = False
 ii = [9,730]
 jj = [12,773]
 kk = [0,50]
+
+use_timestep = False
+tt = [0,3]
 #-----------------------------------------------------------------------------#
 # 3) add additional variables to output (name)
 #    comma separated list: ['var1', 'var2', ...]
@@ -68,6 +71,7 @@ for infile in files:
     # crop data by size
     #-------------------------------------------------------------------------#
     ncid = CROP_DATA(data, use_own_ijk, ii, jj, kk)
+    ncid = CROP_TIME(ncid, use_timestep, tt)
 
 
     # Create dimensions i,j,k
@@ -75,9 +79,10 @@ for infile in files:
     ncid = REASSIGN_DIMENSIONS(ncid)
     ncid = CREATE_BOUNDS(ncid)
 
-    # OPTIONAL: Create time bounds (TODO)
+    # Create time bounds
     #-------------------------------------------------------------------------#
     ncid = ADD_TIME_ATTRS(ncid)
+    ncid = ASSIGN_TIME_BOUNDS(ncid)
 
 
     # Add UTM and geographic coordinate
