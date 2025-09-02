@@ -7,7 +7,6 @@ import xarray as xr
 #from netCDF4 import Dataset
 import numpy as np
 from pyproj import Proj, CRS
-#from osgeo import osr
 import pandas as pd
 from datetime import datetime
 import os
@@ -81,7 +80,26 @@ def CROP_DATA(DATA, SWITCH, II,JJ,KK):
             
     DATA.close()
     return XARR        
-   
+
+def CROP_TIME(DATA, SWITCH, TT):
+    """
+    USER INPUT: Crop data to a specific time frame
+    """
+
+    if SWITCH == True:
+        try:
+            XARR = DATA.isel(time=slice(TT[0],TT[1]))
+            print('INFO: crop file to timesteps={},{}'.format(TT[0],TT[1]))
+        except ValueError:
+            print('ERROR: crop file: insert valid range for time. Stopping programm')
+            raise SystemExit(1)
+
+    else:
+        print('INFO: timesteps not reduced')
+    DATA.close()
+    return XARR  
+
+
 #=============================================================
 def REASSIGN_VERTICAL_DIMENSIONS(XARR):
     """
@@ -385,6 +403,7 @@ def ADD_TIME_ATTRS( XARR):
     XARR.time.attrs['long_name'] = 'time'
     XARR.time.attrs['standard_name'] = 'time'
     XARR.time.attrs['axis'] = 'T'
+    XARR.time.attrs['bounds'] = 'time_bnds'
     return XARR
 
 def ASSIGN_TIME_BOUNDS(XARR):    
@@ -395,20 +414,22 @@ def ASSIGN_TIME_BOUNDS(XARR):
     finally, we create a `time_bnds` (time bounds) variable and fill it with values
     """
     
-    nv =2
+    nv = 2
     val_time = XARR.time.values
 
     # dTime intervale
     ntime = XARR.time.size
     dtime = np.mean(val_time[1:(ntime)] - val_time[0:(ntime-1)])
-    
-    #!!! Correct calculation with datetime is required.
+
+    # calculate bounds
     array = np.empty((ncid.time.size, nv), 'f8')
     array[0:ntime,0] = val_time[0:ntime]-dtime/2.0
     array[0:ntime,1] = val_time[0:ntime]+dtime/2.0
 
     # set time bounds
-    #XARR['time_bnds'] = (['time', 'nv'], array)
+    XARR['time_bnds'] = (['time', 'nv'], array)
+    XARR['time_bnds'] = XARR.time_bnds.astype('datetime64[ns]')
+    XARR['time_bnds'].encoding = {'_FillValue': None}   
     print('INFO: ASSIGN_TIME_BOUNDS done')
 
     # return XARR
